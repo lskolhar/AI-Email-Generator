@@ -15,25 +15,46 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleGenerate = async () => {
+const handleGenerate = async () => {
+  if (!prompt.trim()) {
+    alert("Please enter a prompt");
+
+    return;
+  }
+
+  try {
     setLoading(true);
 
-    // Temporary fake response
-    setTimeout(() => {
-      setSubject("Interview Follow-Up");
+    const response = await fetch("/api/generate", {
+      method: "POST",
 
-      setBody(`Dear Hiring Manager,
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-Thank you for taking the time to interview me today.
+      body: JSON.stringify({
+        prompt,
+        tone,
+      }),
+    });
 
-I appreciate the opportunity and look forward to hearing from you.
+    const data = await response.json();
 
-Best regards,
-Lakshmi`);
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to generate email");
+    }
 
-      setLoading(false);
-    }, 2000);
-  };
+    setSubject(data.subject);
+
+    setBody(data.body);
+  } catch (error) {
+    console.error(error);
+
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCopy = async () => {
     const text = `Subject: ${subject}\n\n${body}`;
