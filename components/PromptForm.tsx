@@ -61,7 +61,7 @@ export default function PromptForm({
         {/* Generate Button */}
         <button
           onClick={onGenerate}
-          disabled={loading || !prompt.trim()}
+          disabled={loading || prompt.trim().length === 0}
           className="w-full bg-blue-500 hover:bg-blue-600 transition rounded-xl py-4 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? <Loader /> : "Generate Email"}
