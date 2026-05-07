@@ -1,0 +1,1 @@
+// Gemini configuration and utilities
