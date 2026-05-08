@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import ErrorMessage from "@/components/ErrorMessage";
 import Navbar from "@/components/Navbar";
 import PromptForm from "@/components/PromptForm";
 import EmailDisplay from "@/components/EmailDisplay";
+import HistorySidebar from "@/components/HistorySidebar";
+
+import { EmailHistoryItem } from "@/types/history";
 
 export default function Home() {
   const [prompt, setPrompt] = useState(
     "Write a follow-up email after an interview..."
   );
+
   const [tone, setTone] = useState("Professional");
 
   const [subject, setSubject] = useState("");
+
   const [body, setBody] = useState("");
+
+  const [displayedBody, setDisplayedBody] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -21,12 +28,60 @@ export default function Home() {
 
   const [copied, setCopied] = useState(false);
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError("Please enter a prompt");
+  const [history, setHistory] = useState<
+    EmailHistoryItem[]
+  >([]);
 
-      return;
+  // Load history from localStorage
+  useEffect(() => {
+    const storedHistory = localStorage.getItem(
+      "email-history"
+    );
+
+    if (storedHistory) {
+      setHistory(JSON.parse(storedHistory));
     }
+  }, []);
+
+  // Typing animation effect
+  useEffect(() => {
+    let index = 0;
+
+    setDisplayedBody("");
+
+    if (!body) return;
+
+    const interval = setInterval(() => {
+      setDisplayedBody(body.slice(0, index));
+
+      index++;
+
+      if (index > body.length) {
+        clearInterval(interval);
+      }
+    }, 10);
+
+    return () => clearInterval(interval);
+  }, [body]);
+
+  const handleGenerate = async () => {
+    if (loading) return;
+    if (!navigator.onLine) {
+  setError("No internet connection");
+
+  return;
+}
+if (!prompt.trim()) {
+  setError("Please enter an email request");
+
+  return;
+}
+
+if (prompt.trim().length < 10) {
+  setError("Prompt should be more descriptive");
+
+  return;
+}
 
     try {
       setLoading(true);
@@ -57,22 +112,49 @@ export default function Home() {
           data.error || "Failed to generate email"
         );
       }
+      if (!data.subject || !data.body) {
+  throw new Error("Invalid AI response");
+}
 
       setSubject(data.subject);
 
       setBody(data.body);
+
+      // Save to history
+      const newHistoryItem: EmailHistoryItem = {
+        id: crypto.randomUUID(),
+        prompt,
+        tone,
+        subject: data.subject,
+        body: data.body,
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedHistory = [
+        newHistoryItem,
+        ...history,
+      ];
+
+      setHistory(updatedHistory);
+
+      localStorage.setItem(
+        "email-history",
+        JSON.stringify(updatedHistory)
+      );
     } catch (error: any) {
       console.error(error);
 
       setError(
-        error.message || "Something went wrong. Please try again."
+        error.message ||
+          "Something went wrong. Please try again."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopy = async () => {
+const handleCopy = async () => {
+  try {
     const text = `Subject: ${subject}\n\n${body}`;
 
     await navigator.clipboard.writeText(text);
@@ -82,6 +164,24 @@ export default function Home() {
     setTimeout(() => {
       setCopied(false);
     }, 2000);
+  } catch (error) {
+    console.error(error);
+
+    setError("Failed to copy email");
+  }
+};
+
+  // Select history item
+  const handleHistorySelect = (
+    item: EmailHistoryItem
+  ) => {
+    setPrompt(item.prompt);
+
+    setTone(item.tone);
+
+    setSubject(item.subject);
+
+    setBody(item.body);
   };
 
   return (
@@ -91,32 +191,42 @@ export default function Home() {
       {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-6 pt-6">
-          <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-xl">
-            {error}
-          </div>
+          <ErrorMessage message={error} />
         </div>
       )}
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Panel */}
-          <PromptForm
-            prompt={prompt}
-            setPrompt={setPrompt}
-            tone={tone}
-            setTone={setTone}
-            onGenerate={handleGenerate}
-            loading={loading}
-          />
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* History Sidebar */}
+          <div className="xl:col-span-1">
+            <HistorySidebar
+              history={history}
+              onSelect={handleHistorySelect}
+            />
+          </div>
 
-          {/* Right Panel */}
-          <EmailDisplay
-            subject={subject}
-            body={body}
-            onCopy={handleCopy}
-            loading={loading}
-            copied={copied}
-          />
+          {/* Prompt Form */}
+          <div className="xl:col-span-1">
+            <PromptForm
+              prompt={prompt}
+              setPrompt={setPrompt}
+              tone={tone}
+              setTone={setTone}
+              onGenerate={handleGenerate}
+              loading={loading}
+            />
+          </div>
+
+          {/* Email Display */}
+          <div className="xl:col-span-2">
+            <EmailDisplay
+              subject={subject}
+              body={displayedBody}
+              onCopy={handleCopy}
+              loading={loading}
+              copied={copied}
+            />
+          </div>
         </div>
       </div>
     </main>

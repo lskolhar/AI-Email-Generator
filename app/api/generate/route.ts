@@ -50,24 +50,43 @@ Body:
 
     const bodyMatch = response.match(/Body:([\s\S]*)/i);
 
-    const subject = subjectMatch?.[1]?.trim() || "No Subject";
+const subject =
+  subjectMatch?.[1]?.trim() ||
+  "Generated Email";
 
-    const emailBody = bodyMatch?.[1]?.trim() || response;
+const emailBody =
+  bodyMatch?.[1]?.trim() ||
+  "Unable to parse email body properly.";
 
     return NextResponse.json({
       subject,
       body: emailBody,
     });
   } catch (error: any) {
-    console.error(error);
+  console.error(error);
 
+  // Gemini Rate Limit
+  if (error.message?.includes("429")) {
     return NextResponse.json(
       {
-        error: error.message || "Something went wrong",
+        error:
+          "Rate limit exceeded. Please wait a moment and try again.",
       },
       {
-        status: 500,
+        status: 429,
       }
     );
   }
+
+  // Generic Failure
+  return NextResponse.json(
+    {
+      error:
+        "Failed to generate email. Please try again later.",
+    },
+    {
+      status: 500,
+    }
+  );
+}
 }

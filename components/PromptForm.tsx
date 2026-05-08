@@ -32,12 +32,17 @@ export default function PromptForm({
             Email Prompt
           </label>
 
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Write a follow-up email after an interview..."
-            className="w-full min-h-[200px] rounded-xl bg-black/20 border border-white/10 p-4 outline-none focus:ring-2 focus:ring-blue-500"
-          />
+         <textarea
+  value={prompt}
+  onChange={(e) => setPrompt(e.target.value)}
+  placeholder="Write a follow-up email after an interview..."
+  maxLength={500}
+  className="w-full min-h-[200px] rounded-xl bg-black/20 border border-white/10 p-4 outline-none focus:ring-2 focus:ring-blue-500"
+/>
+
+<p className="text-sm text-gray-400 mt-2 text-right">
+  {prompt.length}/500 characters
+</p>
         </div>
 
         {/* Tone */}
@@ -60,13 +65,12 @@ export default function PromptForm({
 
         {/* Generate Button */}
         <button
-          type="button"
-          onClick={onGenerate}
-          disabled={loading}
-          className="w-full bg-blue-500 hover:bg-blue-600 transition rounded-xl py-4 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? <Loader /> : "Generate Email"}
-        </button>
+  onClick={onGenerate}
+  disabled={loading}
+  className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 transition rounded-xl py-4 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+>
+  {loading ? <Loader /> : "Generate Email"}
+</button>
       </div>
     </div>
   );

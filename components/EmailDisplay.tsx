@@ -1,3 +1,4 @@
+import { Copy } from "lucide-react";
 interface EmailDisplayProps {
   subject: string;
   body: string;
@@ -21,11 +22,13 @@ export default function EmailDisplay({
         </h2>
 
         <button
-          onClick={onCopy}
-          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition"
-        >
-          {copied ? "Copied!" : "Copy"}
-        </button>
+  onClick={onCopy}
+  disabled={!body}
+  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  <Copy size={18} />
+  {copied ? "Copied!" : "Copy"}
+</button>
       </div>
 
       <div className="space-y-4">
@@ -55,7 +58,7 @@ export default function EmailDisplay({
               body
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
-  Your AI-generated email will appear here
+Start by entering a prompt and generating an email
 </div>
             )}
           </div>
