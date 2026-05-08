@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { model } from "@/lib/gemini";
+import { GenerateEmailRequest } from "@/types/email";
+
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-
+const body: GenerateEmailRequest = await req.json();
     const { prompt, tone } = body;
 
     // Validation
@@ -31,7 +32,7 @@ Tone: ${tone}
 User Request:
 "${prompt}"
 
-Return the response in this EXACT format:
+Return the response in this EXACT format, WITHOUT using bold or markdown formatting:
 
 Subject: <email subject>
 

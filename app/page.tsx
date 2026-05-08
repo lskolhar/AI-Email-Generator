@@ -7,7 +7,9 @@ import PromptForm from "@/components/PromptForm";
 import EmailDisplay from "@/components/EmailDisplay";
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(
+    "Write a follow-up email after an interview..."
+  );
   const [tone, setTone] = useState("Professional");
 
   const [subject, setSubject] = useState("");
@@ -15,58 +17,85 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-const handleGenerate = async () => {
-  if (!prompt.trim()) {
-    alert("Please enter a prompt");
+  const [error, setError] = useState("");
 
-    return;
-  }
+  const [copied, setCopied] = useState(false);
 
-  try {
-    setLoading(true);
+  const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      setError("Please enter a prompt");
 
-    const response = await fetch("/api/generate", {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        prompt,
-        tone,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to generate email");
+      return;
     }
 
-    setSubject(data.subject);
+    try {
+      setLoading(true);
 
-    setBody(data.body);
-  } catch (error) {
-    console.error(error);
+      setError("");
 
-    alert("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+      setSubject("");
+
+      setBody("");
+
+      const response = await fetch("/api/generate", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          prompt,
+          tone,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Failed to generate email"
+        );
+      }
+
+      setSubject(data.subject);
+
+      setBody(data.body);
+    } catch (error: any) {
+      console.error(error);
+
+      setError(
+        error.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCopy = async () => {
     const text = `Subject: ${subject}\n\n${body}`;
 
     await navigator.clipboard.writeText(text);
 
-    alert("Copied to clipboard!");
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
   };
 
   return (
     <main className="min-h-screen bg-[#0f172a] text-white">
       <Navbar />
+
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-6 pt-6">
+          <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-xl">
+            {error}
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -85,6 +114,8 @@ const handleGenerate = async () => {
             subject={subject}
             body={body}
             onCopy={handleCopy}
+            loading={loading}
+            copied={copied}
           />
         </div>
       </div>

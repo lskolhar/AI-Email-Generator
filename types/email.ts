@@ -1,6 +1,13 @@
-export interface Email {
-  id: string;
+export interface GenerateEmailRequest {
+  prompt: string;
+  tone: string;
+}
+
+export interface GenerateEmailResponse {
   subject: string;
   body: string;
-  createdAt: Date;
+}
+
+export interface GenerateEmailError {
+  error: string;
 }
