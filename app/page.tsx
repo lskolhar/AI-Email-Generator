@@ -194,9 +194,9 @@ const handleCopy = async () => {
       )}
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8" style={{ height: 'calc(100vh - 200px)' }}>
           {/* History Sidebar */}
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1 overflow-y-auto custom-scroll rounded-2xl">
             <HistorySidebar
               history={history}
               onSelect={handleHistorySelect}
@@ -204,7 +204,7 @@ const handleCopy = async () => {
           </div>
 
           {/* Prompt Form */}
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1 overflow-y-auto custom-scroll rounded-2xl">
             <PromptForm
               prompt={prompt}
               setPrompt={setPrompt}
@@ -216,7 +216,7 @@ const handleCopy = async () => {
           </div>
 
           {/* Email Display */}
-          <div className="xl:col-span-2">
+          <div className="xl:col-span-2 overflow-y-auto custom-scroll rounded-2xl">
             <EmailDisplay
               subject={subject}
               body={displayedBody}

@@ -15,7 +15,7 @@ export default function EmailDisplay({
   copied,
 }: EmailDisplayProps) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-full backdrop-blur-lg">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-lg">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold">
           Generated Email
@@ -47,7 +47,7 @@ export default function EmailDisplay({
             Email Body
           </p>
 
-          <div className="bg-black/20 rounded-lg p-4 min-h-[300px] whitespace-pre-wrap">
+          <div className="bg-black/20 rounded-lg p-4 min-h-[200px] whitespace-pre-wrap">
             {loading ? (
               <div className="animate-pulse space-y-4">
                 <div className="h-4 bg-white/10 rounded"></div>

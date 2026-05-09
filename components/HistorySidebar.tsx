@@ -14,7 +14,7 @@ export default function HistorySidebar({
   onSelect,
 }: HistorySidebarProps) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-lg h-full">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-lg min-h-full">
       {/* Heading */}
       <div className="flex items-center gap-2 mb-5">
         <Clock3 className="text-blue-400" size={22} />
@@ -25,7 +25,7 @@ export default function HistorySidebar({
       </div>
 
       {/* History List */}
-      <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+      <div className="space-y-3">
         {history.length === 0 ? (
           <div className="flex items-center justify-center h-[200px] text-center">
             <p className="text-gray-400 text-sm leading-6">
